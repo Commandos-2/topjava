@@ -73,7 +73,7 @@ public class MealServlet extends HttpServlet {
                         return;
                     }
                 }
-                mealsToList.add(new MealTo(localDateTime,description,parseInt(calories),false,uuid ));
+                mealsToList.add(new MealTo(localDateTime, description, parseInt(calories), false, uuid));
             }
             mealsToList.RecalculateСaloriesPerDay();
             request.setAttribute("mealsTo", mealsToList.getMealToList());

@@ -16,15 +16,15 @@
         <input type="hidden" name="uuid" value="${mealTo.uuid}">
         <dl>
             <dt>Change date:</dt>
-            <dd><input required type="date"  name="date" size="50" value="${mealTo.date}"></dd>
+            <dd><input required type="date" name="date" size="50" value="${mealTo.date}"></dd>
         </dl>
         <dl>
             <dt>Change time:</dt>
-            <dd><input required type="time"  name="time" size="50" value="${mealTo.time}"></dd>
+            <dd><input required type="time" name="time" size="50" value="${mealTo.time}"></dd>
         </dl>
         <dl>
             <dt>Change calories:</dt>
-            <dd><input required type="text"  name="calories" size="50" value="${mealTo.calories}"></dd>
+            <dd><input required type="text" name="calories" size="50" value="${mealTo.calories}"></dd>
         </dl>
         <dl>
             <dt>Change description:</dt>
