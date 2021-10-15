@@ -17,6 +17,8 @@
         <th>Date</th>
         <th>Description</th>
         <th>Calories</th>
+        <th>Edit</th>
+        <th>Delete</th>
     </tr>
     <c:forEach var="mealsEntry" items="${mealsTo}">
         <jsp:useBean id="mealsEntry" type="ru.javawebinar.topjava.model.MealTo"/>
@@ -29,7 +31,10 @@
             </td>
             <td><%=mealsEntry.getCalories()%>
             </td>
+            <td><a href="meals?uuid=${mealsEntry.uuid}&action=edit">Edit</a></td>
+            <td><a href="meals?uuid=${mealsEntry.uuid}&action=delete">Delete</a></td>
         </tr>
     </c:forEach></table>
+<h3><a href="meals?action=add">Add meal</a></h3>
 </body>
 </html>
