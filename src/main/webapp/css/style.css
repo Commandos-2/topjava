@@ -1,0 +1,15 @@
+table {
+    border: 1px solid #399;
+    border-spacing: 7px 5px; /* Расстояние между границ */
+    color: black; /* Цвет текста */
+}
+th{
+    background: aquamarine; /* Цвет фона таблицы */
+    border: 1px solid #333; /* Граница вокруг ячеек */
+    padding: 5px; /* Поля в ячейках */
+}
+td{
+    border: 1px solid #333; /* Граница вокруг ячеек */
+    padding: 5px; /* Поля в ячейках */
+}
+
