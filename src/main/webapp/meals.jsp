@@ -22,14 +22,14 @@
     </tr>
     <c:forEach var="mealsEntry" items="${mealsTo}">
         <jsp:useBean id="mealsEntry" type="ru.javawebinar.topjava.model.MealTo"/>
-        <fmt:parseDate value="${mealsEntry.getDateTime()}" pattern="yyyy-MM-dd'T'HH:mm" var="parsedDateTime"
+        <fmt:parseDate value="${mealsEntry.dateTime}" pattern="yyyy-MM-dd'T'HH:mm" var="parsedDateTime"
                        type="both"/>
-        <fmt:formatDate value="${parsedDateTime}" var="dateTime" pattern="yyyy - dd MMM  - hh:mm"/>
-        <tr style="color:<% if(mealsEntry.isExcess()){%> #cc0000<%}else {%> #006400<%}%>">
+        <fmt:formatDate value="${parsedDateTime}" var="dateTime" pattern="yyyy-MM-dd HH:mm"/>
+        <tr style="color:<%=(mealsEntry.isExcess()) ? "#cc0000" : "#006400"%>">
             <td>${dateTime}</td>
-            <td><%=mealsEntry.getDescription()%>
+            <td>${mealsEntry.description}
             </td>
-            <td><%=mealsEntry.getCalories()%>
+            <td>${mealsEntry.calories}
             </td>
             <td><a href="meals?uuid=${mealsEntry.uuid}&action=edit">Edit</a></td>
             <td><a href="meals?uuid=${mealsEntry.uuid}&action=delete">Delete</a></td>

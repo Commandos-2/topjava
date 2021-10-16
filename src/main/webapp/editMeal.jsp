@@ -6,29 +6,26 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <link rel="stylesheet" href="css/style.css">
-    <jsp:useBean id="mealTo" type="ru.javawebinar.topjava.model.MealTo" scope="request"/>
+    <jsp:useBean id="meal" type="ru.javawebinar.topjava.model.Meal" scope="request"/>
     <title>Table meals</title>
 </head>
 <body>
 <h3><a href="index.html">Home</a></h3>
 <section>
-    <form method="get" action="meals" enctype="application/x-www-form-urlencoded">
-        <input type="hidden" name="uuid" value="${mealTo.uuid}">
+    <form method="post" action="meals" enctype="application/x-www-form-urlencoded">
+        <input type="hidden" name="uuid" value="${meal.uuid}">
         <dl>
             <dt>Change date:</dt>
-            <dd><input required type="date" name="date" size="50" value="${mealTo.date}"></dd>
-        </dl>
-        <dl>
-            <dt>Change time:</dt>
-            <dd><input required type="time" name="time" size="50" value="${mealTo.time}"></dd>
+            <dd><input required type="datetime-local" name="datetime" size="50"
+                       value="<%if(meal.getDateTime()!=null){%>${meal.dateTime}<%}%>"></dd>
         </dl>
         <dl>
             <dt>Change calories:</dt>
-            <dd><input required type="text" name="calories" size="50" value="${mealTo.calories}"></dd>
+            <dd><input required type="number" name="calories" size="50" value="${meal.calories}"></dd>
         </dl>
         <dl>
             <dt>Change description:</dt>
-            <dd><input required type="text" name="description" size="50" value="${mealTo.description}"></dd>
+            <dd><input required type="text" name="description" size="50" value="${meal.description}"></dd>
         </dl>
         <button type="submit">Сохранить</button>
         <button type="reset">Отменить изменения</button>

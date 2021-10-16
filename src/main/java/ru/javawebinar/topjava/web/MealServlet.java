@@ -2,83 +2,77 @@ package ru.javawebinar.topjava.web;
 
 import org.slf4j.Logger;
 import ru.javawebinar.topjava.model.Meal;
-import ru.javawebinar.topjava.model.MealTo;
-import ru.javawebinar.topjava.model.MealToList;
+import ru.javawebinar.topjava.storage.MealListStorage;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.Month;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
 
 import static java.lang.Integer.parseInt;
 import static org.slf4j.LoggerFactory.getLogger;
-import static ru.javawebinar.topjava.util.MealsUtil.*;
 import static ru.javawebinar.topjava.util.MealsUtil.filteredByStreams;
 
 public class MealServlet extends HttpServlet {
     private static final Logger log = getLogger(MealServlet.class);
-    MealToList mealsToList;
+    private MealListStorage mealStorage;
+    final int caloriesPerDay = 2000;
 
     public void init() {
-        mealsToList = new MealToList(LocalTime.of(0, 0), LocalTime.of(23, 59));
+        mealStorage = new MealListStorage();
     }
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        log.debug("redirect to meals");
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        response.setCharacterEncoding("UTF-8");
+        request.setCharacterEncoding("UTF-8");
+        String uuid = request.getParameter("uuid");
+        String calories = request.getParameter("calories");
+        String description = request.getParameter("description");
+        String dateTime = request.getParameter("datetime");
+        if (calories != null && description != null && uuid != null) {
+            LocalDateTime localDateTime = LocalDateTime.parse(dateTime);
+            Meal newMeal = new Meal(uuid, localDateTime, description, parseInt(calories));
+            if (mealStorage.update(newMeal)) {
+                log.debug("redirect to meals, edit:" + newMeal);
+            } else {
+                mealStorage.save(newMeal);
+                log.debug("redirect to meals, create:" + newMeal);
+            }
+        }
+        request.setAttribute("mealsTo", filteredByStreams(mealStorage.getStorage(), LocalTime.of(0, 0), LocalTime.of(23, 59, 59, 999999), caloriesPerDay));
+        request.getRequestDispatcher("meals.jsp").forward(request, response);
+    }
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws
+            ServletException, IOException {
         String action = request.getParameter("action");
         String uuid = request.getParameter("uuid");
         if (action != null) {
             switch (action) {
-                case "delete":
-                    mealsToList.delete(uuid);
-                    mealsToList.RecalculateСaloriesPerDay();
-                    response.sendRedirect("meals");
-                    return;
                 case "edit":
-                    request.setAttribute("mealTo", mealsToList.get(uuid));
-                    request.getRequestDispatcher("edit.jsp").forward(request, response);
+                    request.setAttribute("meal", mealStorage.get(uuid));
+                    log.debug("redirect to editMeal.jsp, edit:" + mealStorage.get(uuid).toString());
+                    request.getRequestDispatcher("editMeal.jsp").forward(request, response);
                     return;
                 case "add":
-                    request.setAttribute("mealTo", createTo(new Meal(), false));
-                    request.getRequestDispatcher("edit.jsp").forward(request, response);
+                    request.setAttribute("meal", new Meal());
+                    log.debug("redirect to editMeal.jsp, create new meal");
+                    request.getRequestDispatcher("editMeal.jsp").forward(request, response);
+                    return;
+                case "delete":
+                    log.debug("redirect to meals, delete:" + mealStorage.get(uuid).toString());
+                    mealStorage.delete(uuid);
+                    response.sendRedirect("meals");
                     return;
             }
-        } else {
-            String calories = request.getParameter("calories");
-            String description = request.getParameter("description");
-            String date = request.getParameter("date");
-            String time = request.getParameter("time");
-            if (calories != null && description != null && uuid != null) {
-                LocalDateTime localDateTime = LocalDateTime.of(LocalDate.parse(date), LocalTime.parse(time));
-                for (MealTo mealTo : mealsToList.getMealToList()) {
-                    if (mealTo.getUuid().equals(uuid)) {
-                        mealTo.setDateTime(localDateTime);
-                        mealTo.setCalories(parseInt(calories));
-                        mealTo.setDescription(description);
-                        mealsToList.RecalculateСaloriesPerDay();
-                        request.setAttribute("mealsTo", mealsToList.getMealToList());
-                        request.getRequestDispatcher("meals.jsp").forward(request, response);
-                        return;
-                    }
-                }
-                mealsToList.add(new MealTo(localDateTime, description, parseInt(calories), false, uuid));
-            }
-            mealsToList.RecalculateСaloriesPerDay();
-            request.setAttribute("mealsTo", mealsToList.getMealToList());
-            request.getRequestDispatcher("meals.jsp").forward(request, response);
-            return;
         }
+        log.debug("redirect to meals, display list meals");
+        request.setAttribute("mealsTo", filteredByStreams(mealStorage.getStorage(), LocalTime.of(0, 0), LocalTime.of(23, 59, 59, 999999), caloriesPerDay));
+        request.getRequestDispatcher("meals.jsp").forward(request, response);
     }
 }
