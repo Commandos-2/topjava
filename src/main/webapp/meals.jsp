@@ -25,7 +25,7 @@
         <fmt:parseDate value="${mealsEntry.dateTime}" pattern="yyyy-MM-dd'T'HH:mm" var="parsedDateTime"
                        type="both"/>
         <fmt:formatDate value="${parsedDateTime}" var="dateTime" pattern="yyyy-MM-dd HH:mm"/>
-        <tr style="color:<%=(mealsEntry.isExcess()) ? "#cc0000" : "#006400"%>">
+        <tr style="color:${mealsEntry.excess ? '#cc0000' : '#006400'}">
             <td>${dateTime}</td>
             <td>${mealsEntry.description}
             </td>
