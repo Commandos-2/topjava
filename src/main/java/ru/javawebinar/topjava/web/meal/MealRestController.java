@@ -11,46 +11,47 @@ import ru.javawebinar.topjava.util.MealsUtil;
 import ru.javawebinar.topjava.web.SecurityUtil;
 
 import java.util.Collection;
+import java.util.List;
 
 import static ru.javawebinar.topjava.util.ValidationUtil.assureIdConsistent;
 import static ru.javawebinar.topjava.util.ValidationUtil.checkNew;
 
 @Controller
 public class MealRestController {
-    protected final Logger log = LoggerFactory.getLogger(getClass());
+    private final Logger log = LoggerFactory.getLogger(getClass());
 
     @Autowired
     private MealService service;
 
-    public Collection<MealTo> getAll() {
+    public List<MealTo> getAll() {
         log.info("getAll");
-        int userId=SecurityUtil.authUserId();
-        return MealsUtil.getTos(service.getAll(userId),MealsUtil.DEFAULT_CALORIES_PER_DAY);
+        int userId = SecurityUtil.authUserId();
+        return MealsUtil.getTos(service.getAll(userId), MealsUtil.DEFAULT_CALORIES_PER_DAY);
     }
 
     public Meal get(int id) {
         log.info("get {}", id);
-        int userId=SecurityUtil.authUserId();
-        return service.get(id,userId);
+        int userId = SecurityUtil.authUserId();
+        return service.get(id, userId);
     }
 
     public Meal create(Meal meal) {
         log.info("create {}", meal);
-        int userId=SecurityUtil.authUserId();
+        int userId = SecurityUtil.authUserId();
         checkNew(meal);
-        return service.create(meal,userId);
+        return service.create(meal, userId);
     }
 
     public void delete(int id) {
         log.info("delete {}", id);
-        int userId=SecurityUtil.authUserId();
-        service.delete(id,userId);
+        int userId = SecurityUtil.authUserId();
+        service.delete(id, userId);
     }
 
     public void update(Meal meal, int id) {
         log.info("update {} with id={}", meal, id);
-        int userId=SecurityUtil.authUserId();
+        int userId = SecurityUtil.authUserId();
         assureIdConsistent(meal, id);
-        service.update(meal,userId);
+        service.update(meal, userId);
     }
 }

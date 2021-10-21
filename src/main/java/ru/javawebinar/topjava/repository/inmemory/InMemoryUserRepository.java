@@ -7,8 +7,10 @@ import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.repository.UserRepository;
 import ru.javawebinar.topjava.util.UserUtil;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -18,6 +20,7 @@ public class InMemoryUserRepository implements UserRepository {
     private static final Logger log = LoggerFactory.getLogger(InMemoryUserRepository.class);
     private final Map<Integer, User> repository = new ConcurrentHashMap<>();
     private final AtomicInteger counter = new AtomicInteger(0);
+    Comparator<User> USER_COMPARATOR = Comparator.comparing(User::getName).thenComparing(User::getEmail);
 
     {
         UserUtil.users.forEach(this::save);
@@ -50,12 +53,12 @@ public class InMemoryUserRepository implements UserRepository {
     @Override
     public List<User> getAll() {
         log.info("getAll");
-        return repository.values().stream().sorted((o2, o1) -> o1.getName().compareTo(o2.getName())).collect(Collectors.toList());
+        return repository.values().stream().sorted(USER_COMPARATOR).collect(Collectors.toList());
     }
 
     @Override
-    public User getByEmail(String email) {
+    public User getByEmail(String email) throws NoSuchElementException {
         log.info("getByEmail {}", email);
-        return repository.values().stream().filter(x -> x.getEmail().equals(email)).findFirst().get();
+        return repository.values().stream().filter(u -> u.getEmail().equals(email)).findFirst().get();
     }
 }

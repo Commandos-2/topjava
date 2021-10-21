@@ -12,7 +12,7 @@ public class UserUtil {
     public static final List<User> users = new ArrayList<>();
 
     public UserUtil() {
-        users.add(new User(0, "Sergey", "sergkurs2006@mail.ru", "123", USER));
-        users.add(new User(1, "Grigory", "grigory@mail.ru", "234", ADMIN));
+        users.add(new User(null, "Sergey", "sergkurs2006@mail.ru", "123", USER));
+        users.add(new User(null, "Grigory", "grigory@mail.ru", "234", ADMIN));
     }
 }
