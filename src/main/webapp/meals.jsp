@@ -49,6 +49,27 @@
             </tr>
         </c:forEach>
     </table>
+    <h2>Filter by date and time</h2>
+    <form method="get" action="meals">
+        <dl>
+            <dt>Date start:</dt>
+            <dd><input type="date" value="" name="dateStart"></dd>
+        </dl>
+        <dl>
+            <dt>Date end:</dt>
+            <dd><input type="date" value="" name="dateEnd"></dd>
+        </dl>
+        <dl>
+            <dt>Time start:</dt>
+            <dd><input type="time" value="" name="timeStart"></dd>
+        </dl>
+        <dl>
+            <dt>Time end:</dt>
+            <dd><input type="time" value="" name="timeEnd"></dd>
+        </dl>
+        <button type="submit">Filter</button>
+        <button onclick="window.history.back()" type="button">Cancel</button>
+    </form>
 </section>
 </body>
 </html>
