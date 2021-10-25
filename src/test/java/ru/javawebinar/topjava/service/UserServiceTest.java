@@ -90,6 +90,6 @@ public class UserServiceTest {
     @Test
     public void getAll() {
         List<User> all = service.getAll();
-        assertMatch(all, admin, user);
+        assertMatch(all, admin, user,user2);
     }
 }
