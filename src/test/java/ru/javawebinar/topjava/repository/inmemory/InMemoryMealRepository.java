@@ -27,7 +27,7 @@ import static ru.javawebinar.topjava.UserTestData.USER_ID;
 public class InMemoryMealRepository implements MealRepository {
     private static final Logger log = LoggerFactory.getLogger(InMemoryMealRepository.class);
 
-    // Map  userId -> mealRepository
+    // Map  user_id -> mealRepository
     private final Map<Integer, InMemoryBaseRepository<Meal>> usersMealsMap = new ConcurrentHashMap<>();
 
     {

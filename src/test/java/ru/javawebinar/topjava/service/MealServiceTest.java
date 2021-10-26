@@ -14,7 +14,8 @@ import ru.javawebinar.topjava.MealTestData;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 
-import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.assertThrows;
@@ -36,62 +37,74 @@ public class MealServiceTest {
     private MealService service;
 
     @Test
-    public void testGet() {
-        Meal meal = service.get(MEAL_ID, 100001);
+    public void Get() {
+        Meal meal = service.get(MEAL_ID, ADMIN);
+        //Meal newMeal= MealTestData.meal; // я не понимаю почему это происходит..
+        //newMeal.setId(MEAL_ID);           // если раскоментировать, то все заработает, но ведь я нечего не меняю по сути этим кодом..
         Assert.assertEquals(meal, MealTestData.meal);
     }
 
     @Test
-    public void testGetAlienMeal() {
-        assertThrows(NotFoundException.class, () -> service.get(MEAL_ID, 100002));
+    public void GetAlienMeal() {
+        assertThrows(NotFoundException.class, () -> service.get(MEAL_ID, USER2));
     }
 
     @Test
-    public void testDelete() {
-        service.delete(MEAL_ID, 100001);
-        assertThrows(NotFoundException.class, () -> service.get(MEAL_ID, 100001));
+    public void Delete() {
+        service.delete(MEAL_ID, ADMIN);
+        assertThrows(NotFoundException.class, () -> service.get(MEAL_ID, ADMIN));
     }
 
     @Test
-    public void testDeleteAlienMeal() {
-        assertThrows(NotFoundException.class, () -> service.delete(MEAL_ID, 100002));
+    public void DeleteAlienMeal() {
+        assertThrows(NotFoundException.class, () -> service.delete(MEAL_ID, USER2));
     }
 
     @Test
     public void deletedNotFound() {
-        assertThrows(NotFoundException.class, () -> service.delete(NOT_FOUND, 100001));
+        assertThrows(NotFoundException.class, () -> service.delete(NOT_FOUND, ADMIN));
     }
 
     @Test
-    public void testGetBetweenInclusive() {
+    public void GetBetweenInclusive() {
+        List<Meal> list = service.getBetweenInclusive(startDateTime, endDateTime, USER2);
+        Assert.assertEquals(list, Collections.singletonList(meal3));
+    }
+
+
+    @Test
+    public void GetAll() {
+        List<Meal> all = service.getAll(USER2);
+        Assert.assertEquals(all, Arrays.asList(meal2, meal3));
     }
 
     @Test
-    public void testGetAll() {
-        List<Meal> all = service.getAll(100002);
-        assertMatch(all, getListMeal());
+    public void Update() {
+        service.update(getNewMeal(MEAL_ID), ADMIN);
+        Assert.assertEquals(service.get(MEAL_ID, ADMIN), getNewMeal(MEAL_ID));
     }
 
     @Test
-    public void testUpdate() {
-        Meal updated = getNewMeal(MEAL_ID);
-        service.update(updated, 100001);
-        Assert.assertEquals(service.get(MEAL_ID, 100001), updated);
+    public void UpdateAlienMeal() {
+        assertThrows(NotFoundException.class, () -> service.update(getNewMeal(MEAL_ID), USER2));
     }
 
+
     @Test
-    public void duplicateMailCreate() {
+    public void duplicateDateCreate() {
+        Meal duplicateDateMeal = meal2;
+        duplicateDateMeal.setDateTime(service.get(MEAL_ID, ADMIN).getDateTime());
+        duplicateDateMeal.setId(null);
         assertThrows(DataAccessException.class, () ->
-                service.create(new Meal(null, LocalDateTime.of(2020, 12, 19, 10, 00, 00), "Dinner", 1000), 100001));
+                service.create(duplicateDateMeal, ADMIN));
     }
 
     @Test
-    public void testCreate() {
+    public void Create() {
         Meal created = service.create(getNewMeal(null), 100001);
         Integer newId = created.getId();
-        Meal newUser = getNewMeal(22);
-        newUser.setId(newId);
+        Meal newUser = getNewMeal(newId);
         Assert.assertEquals(created, newUser);
-        Assert.assertEquals(service.get(newId, 100001), newUser);
+        Assert.assertEquals(service.get(newId, ADMIN), newUser);
     }
 }

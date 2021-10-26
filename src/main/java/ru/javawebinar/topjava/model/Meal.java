@@ -3,8 +3,6 @@ package ru.javawebinar.topjava.model;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.Collections;
-import java.util.Date;
 import java.util.Objects;
 
 public class Meal extends AbstractBaseEntity {
@@ -18,7 +16,7 @@ public class Meal extends AbstractBaseEntity {
     }
 
     public Meal(Meal meal) {
-        this(meal.getDateTime(), meal.getDescription(), meal.getCalories());
+        this(meal.getId(),meal.getDateTime(), meal.getDescription(), meal.getCalories());
     }
 
     public Meal(LocalDateTime dateTime, String description, int calories) {
@@ -78,7 +76,7 @@ public class Meal extends AbstractBaseEntity {
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
         Meal meal = (Meal) o;
-        return Objects.equals(id, meal.id) && calories == meal.calories && dateTime.equals(meal.dateTime) && description.equals(meal.description);
+        return id.equals(meal.id) && calories == meal.calories && dateTime.equals(meal.dateTime) && description.equals(meal.description);
     }
 
     @Override
@@ -90,7 +88,7 @@ public class Meal extends AbstractBaseEntity {
     public String toString() {
         return "Meal{" +
                 "id=" + id +
-                ", dateTime=" + dateTime +
+                ", date_time=" + dateTime +
                 ", description='" + description + '\'' +
                 ", calories=" + calories +
                 '}';

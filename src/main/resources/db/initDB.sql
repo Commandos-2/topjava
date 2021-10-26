@@ -25,25 +25,26 @@ CREATE TABLE user_roles
     FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 );
 
-create table meals
+CREATE TABLE meals
 (
-    id          integer not null
-        constraint meals_pk
-            primary key DEFAULT nextval('global_seq'),
-    description varchar,
-    calories    integer,
-    dateTime  TIMESTAMP    not null,
-    userId    integer not null
-        constraint meals_users_id_fk
-            references users
-            on delete cascade,
-        constraint order_date_unique
-            unique (userId, dateTime)
+	id INTEGER DEFAULT nextval('global_seq') NOT NULL,
+	description VARCHAR,
+	calories INTEGER,
+	date_time TIMESTAMP NOT NULL,
+	user_id INTEGER NOT NULL
+        CONSTRAINT meals_users_id_fk
+			REFERENCES users
+            ON DELETE CASCADE,
+    CONSTRAINT user_date_unique
+		UNIQUE (user_id, date_time)
 );
 
-alter table meals
-    owner to "user";
+ALTER TABLE meals OWNER TO "user";
 
-create unique index meals_unique_id_idx
-    on meals (id);
+ALTER TABLE meals
+	ADD CONSTRAINT meals_pk
+		PRIMARY KEY (id);
+
+
+
 

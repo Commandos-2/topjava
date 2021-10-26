@@ -48,9 +48,9 @@
         <c:forEach items="${requestScope.meals}" var="meal">
             <tr data-mealExcess="${meal.excess}">
                 <td>
-                        <%--${meal.dateTime.toLocalDate()} ${meal.dateTime.toLocalTime()}--%>
+                        <%--${meal.date_time.toLocalDate()} ${meal.date_time.toLocalTime()}--%>
                         <%--<%=TimeUtil.toString(meal.getDateTime())%>--%>
-                        <%--${fn:replace(meal.dateTime, 'T', ' ')}--%>
+                        <%--${fn:replace(meal.date_time, 'T', ' ')}--%>
                         ${fn:formatDateTime(meal.dateTime)}
                 </td>
                 <td>${meal.description}</td>
