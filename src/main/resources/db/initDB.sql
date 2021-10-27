@@ -27,23 +27,24 @@ CREATE TABLE user_roles
 
 CREATE TABLE meals
 (
-	id INTEGER DEFAULT nextval('global_seq') NOT NULL,
-	description VARCHAR,
-	calories INTEGER,
-	date_time TIMESTAMP NOT NULL,
-	user_id INTEGER NOT NULL
+    id          INTEGER DEFAULT nextval('global_seq') NOT NULL,
+    description VARCHAR                               NOT NULL,
+    calories    INTEGER                               NOT NULL,
+    date_time   TIMESTAMP                             NOT NULL,
+    user_id     INTEGER                               NOT NULL
         CONSTRAINT meals_users_id_fk
-			REFERENCES users
+            REFERENCES users
             ON DELETE CASCADE,
     CONSTRAINT user_date_unique
-		UNIQUE (user_id, date_time)
+        UNIQUE (user_id, date_time)
 );
 
-ALTER TABLE meals OWNER TO "user";
+ALTER TABLE meals
+    OWNER TO "user";
 
 ALTER TABLE meals
-	ADD CONSTRAINT meals_pk
-		PRIMARY KEY (id);
+    ADD CONSTRAINT meals_pk
+        PRIMARY KEY (id);
 
 
 

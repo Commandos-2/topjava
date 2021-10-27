@@ -37,26 +37,26 @@ public class MealServiceTest {
     private MealService service;
 
     @Test
-    public void Get() {
+    public void get() {
         Meal meal = service.get(MEAL_ID, ADMIN);
-        //Meal newMeal= MealTestData.meal; // я не понимаю почему это происходит..
-        //newMeal.setId(MEAL_ID);           // если раскоментировать, то все заработает, но ведь я нечего не меняю по сути этим кодом..
-        Assert.assertEquals(meal, MealTestData.meal);
+        Meal newMeal = MealTestData.meal; // я не понимаю почему это происходит..
+        newMeal.setId(MEAL_ID);           // если раскоментировать, то все заработает, но ведь я нечего не меняю по сути этим кодом..
+        Assert.assertEquals(MealTestData.meal, meal);
     }
 
     @Test
-    public void GetAlienMeal() {
+    public void getAlienMeal() {
         assertThrows(NotFoundException.class, () -> service.get(MEAL_ID, USER2));
     }
 
     @Test
-    public void Delete() {
+    public void delete() {
         service.delete(MEAL_ID, ADMIN);
         assertThrows(NotFoundException.class, () -> service.get(MEAL_ID, ADMIN));
     }
 
     @Test
-    public void DeleteAlienMeal() {
+    public void deleteAlienMeal() {
         assertThrows(NotFoundException.class, () -> service.delete(MEAL_ID, USER2));
     }
 
@@ -66,29 +66,28 @@ public class MealServiceTest {
     }
 
     @Test
-    public void GetBetweenInclusive() {
+    public void getBetweenInclusive() {
         List<Meal> list = service.getBetweenInclusive(startDateTime, endDateTime, USER2);
-        Assert.assertEquals(list, Collections.singletonList(meal3));
+        Assert.assertEquals(Collections.singletonList(meal2), list);
     }
 
 
     @Test
-    public void GetAll() {
+    public void getAll() {
         List<Meal> all = service.getAll(USER2);
-        Assert.assertEquals(all, Arrays.asList(meal2, meal3));
+        Assert.assertEquals(Arrays.asList(meal3, meal2), all);
     }
 
     @Test
-    public void Update() {
+    public void update() {
         service.update(getNewMeal(MEAL_ID), ADMIN);
-        Assert.assertEquals(service.get(MEAL_ID, ADMIN), getNewMeal(MEAL_ID));
+        Assert.assertEquals(getNewMeal(MEAL_ID), service.get(MEAL_ID, ADMIN));
     }
 
     @Test
-    public void UpdateAlienMeal() {
+    public void updateAlienMeal() {
         assertThrows(NotFoundException.class, () -> service.update(getNewMeal(MEAL_ID), USER2));
     }
-
 
     @Test
     public void duplicateDateCreate() {
@@ -100,11 +99,11 @@ public class MealServiceTest {
     }
 
     @Test
-    public void Create() {
-        Meal created = service.create(getNewMeal(null), 100001);
+    public void create() {
+        Meal created = service.create(getNewMeal(null), ADMIN);
         Integer newId = created.getId();
         Meal newUser = getNewMeal(newId);
-        Assert.assertEquals(created, newUser);
-        Assert.assertEquals(service.get(newId, ADMIN), newUser);
+        Assert.assertEquals(newUser, created);
+        Assert.assertEquals(newUser, service.get(newId, ADMIN));
     }
 }
