@@ -5,7 +5,6 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.repository.MealRepository;
-import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -23,21 +22,18 @@ public class JpaMealRepository implements MealRepository {
     @Override
     @Transactional
     public Meal save(Meal meal, int userId) {
+       User ref = em.getReference(User.class, userId);
         if (meal.isNew()) {
-            User ref = em.getReference(User.class, userId);
             meal.setUser(ref);
             em.persist(meal);
             return meal;
         } else {
-            if (em.createNamedQuery(Meal.UPDATE)
-                    .setParameter("date_time", meal.getDateTime())
-                    .setParameter("calories", meal.getCalories())
-                    .setParameter("description", meal.getDescription())
-                    .setParameter("id", meal.getId())
-                    .setParameter("user_id", userId).executeUpdate() != 0) {
-                return meal;
+            if (em.find(Meal.class, meal.getId()).getUser() == ref) {
+                meal.setUser(ref);
+                return em.merge(meal);
+            } else {
+                return null;
             }
-            return null;
         }
     }
 
@@ -51,15 +47,14 @@ public class JpaMealRepository implements MealRepository {
     }
 
     @Override
-    public Meal get(int id, int userId) {
-        try {
-            return em.createNamedQuery(Meal.GET, Meal.class)
-                    .setParameter("id", id)
-                    .setParameter("user_id", userId).getSingleResult();
-        } catch (NoResultException e) {
-            throw new NotFoundException(e.getMessage());
+    public Meal get(int id, int userId) throws NoResultException {
+        User ref = em.getReference(User.class, userId);
+        Meal meal = em.find(Meal.class, id);
+        if (meal != null && meal.getUser() == ref) {
+            return meal;
+        } else {
+            return null;
         }
-
     }
 
     @Override
