@@ -1,8 +1,12 @@
 package ru.javawebinar.topjava.service;
 
 import org.junit.AfterClass;
+import org.junit.AssumptionViolatedException;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.Stopwatch;
+import org.junit.rules.TestRule;
+import org.junit.runner.Description;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -11,13 +15,13 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
 import org.springframework.test.context.junit4.SpringRunner;
 import ru.javawebinar.topjava.model.Meal;
-import ru.javawebinar.topjava.util.MyJUnitStopWatch;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertThrows;
 import static ru.javawebinar.topjava.MealTestData.*;
@@ -32,19 +36,40 @@ import static ru.javawebinar.topjava.UserTestData.USER_ID;
 @Sql(scripts = "classpath:db/populateDB.sql", config = @SqlConfig(encoding = "UTF-8"))
 public class MealServiceTest {
 
-    private static List<String> timeList= new ArrayList<>();
-
-    @Rule
-    public MyJUnitStopWatch myJUnitStopWatch = new MyJUnitStopWatch(timeList);
-
-
-    @AfterClass
-    public static void afterClass() {
-        timeList.forEach(System.out::println);
-    }
+    static org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(MealServiceTest.class);
+    private static List<String> timeList = new ArrayList<>();
 
     @Autowired
     private MealService service;
+
+    @AfterClass
+    public static void afterClass() {
+        logger.info(String.join("\n", timeList));
+    }
+
+    @Rule
+    public TestRule myJUnitStopWatch = new Stopwatch() {
+
+        private void logInfo(Description description, String status, long nanos, List<String> list) {
+            String testName = description.getMethodName();
+            String message = String.format("Test %26s : %12d microseconds",
+                    testName, TimeUnit.MILLISECONDS.toMicros(nanos));
+            logger.info(message);
+            if (status.equals("skipped") || status.equals("finished")) {
+                timeList.add(message);
+            }
+        }
+
+        @Override
+        protected void skipped(long nanos, AssumptionViolatedException e, Description description) {
+            logInfo(description, "skipped", nanos, timeList);
+        }
+
+        @Override
+        protected void finished(long nanos, Description description) {
+            logInfo(description, "finished", nanos, timeList);
+        }
+    };
 
     @Test
     public void delete() {
@@ -77,7 +102,6 @@ public class MealServiceTest {
         assertThrows(DataAccessException.class, () ->
                 service.create(new Meal(null, meal1.getDateTime(), "duplicate", 100), USER_ID));
     }
-
 
     @Test
     public void get() {
@@ -124,9 +148,5 @@ public class MealServiceTest {
     @Test
     public void getBetweenWithNullDates() {
         MEAL_MATCHER.assertMatch(service.getBetweenInclusive(null, null, USER_ID), meals);
-    }
-
-    private static void getTimeAllTest(MyJUnitStopWatch myJUnitStopWatch) {
-
     }
 }
