@@ -1,6 +1,6 @@
 package ru.javawebinar.topjava.model;
 
-import ru.javawebinar.topjava.util.TimeUtil;
+import ru.javawebinar.topjava.to.MealTo;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static ru.javawebinar.topjava.util.MealsUtil.filteredByStreams;
+import static ru.javawebinar.topjava.util.MealsUtil.getFilteredTos;
 
 public class MealToList {
     private List<MealTo> mealToList;
@@ -27,7 +27,7 @@ public class MealToList {
                 new Meal(LocalDateTime.of(2020, Month.JANUARY, 31, 13, 0), "Обед", 500),
                 new Meal(LocalDateTime.of(2020, Month.JANUARY, 31, 20, 0), "Ужин", 410)
         );
-        this.mealToList = filteredByStreams(meals, startTime, endTime, caloriesPerDay);
+        this.mealToList = getFilteredTos(meals, caloriesPerDay, endTime,startTime );
     }
 
     public List<MealTo> getMealToList() {
@@ -40,7 +40,7 @@ public class MealToList {
 
     public void delete(String uuid) {
         for (MealTo mealTo : mealToList) {
-            if (mealTo.getUuid().equals(uuid)) {
+            if (mealTo.getId().equals(uuid)) {
                 mealToList.remove(mealTo);
                 break;
             }
@@ -49,7 +49,7 @@ public class MealToList {
 
     public MealTo get(String uuid) {
         for (MealTo mealTo : mealToList) {
-            if (mealTo.getUuid().equals(uuid)) {
+            if (mealTo.getId().equals(uuid)) {
                 return mealTo;
             }
         }

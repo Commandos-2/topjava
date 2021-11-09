@@ -56,11 +56,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
-                <version>3.3.1</version>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-war-plugin</artifactId>
                 <version>3.3.2</version>
             </plugin>
             <plugin>
@@ -231,8 +226,20 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
         </profile>
-    </profiles>
 
+        <profile>
+            <id>jdbc</id>
+        </profile>
+
+        <profile>
+            <id>jpa</id>
+        </profile>
+
+        <profile>
+            <id>datajpa</id>
+        </profile>
+
+    </profiles>
     <dependencyManagement>
         <dependencies>
             <dependency>
