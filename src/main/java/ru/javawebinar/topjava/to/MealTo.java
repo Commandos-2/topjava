@@ -1,6 +1,5 @@
 package ru.javawebinar.topjava.to;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class MealTo {
@@ -12,7 +11,7 @@ public class MealTo {
 
     private final int calories;
 
-    private boolean excess;
+    private final boolean excess;
 
     public MealTo(Integer id, LocalDateTime dateTime, String description, int calories, boolean excess) {
         this.id = id;
@@ -30,10 +29,6 @@ public class MealTo {
         return dateTime;
     }
 
-    public LocalDate getDate(){
-        return getDateTime().toLocalDate();
-    }
-
     public String getDescription() {
         return description;
     }
@@ -44,10 +39,6 @@ public class MealTo {
 
     public boolean isExcess() {
         return excess;
-    }
-
-    public void setExcess(boolean excess) {
-        this.excess=excess;
     }
 
     @Override

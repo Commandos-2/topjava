@@ -1,6 +1,5 @@
 package ru.javawebinar.topjava.repository.datajpa;
 
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.model.User;
@@ -20,17 +19,11 @@ public class DataJpaMealRepository implements MealRepository {
 
     @Override
     public Meal save(Meal meal, int userId) {
-        if (meal.isNew()) {
+        if (meal.isNew()||this.get(meal.getId(), userId) != null) {
             User user = new User();
             user.setId(userId);
             meal.setUser(user);
-            return crudRepository.saveAndFlush(meal);
-        }
-        if (crudRepository.findByUserId(meal.getId(), userId) != null) {
-            User user = new User();
-            user.setId(userId);
-            meal.setUser(user);
-            return crudRepository.saveAndFlush(meal);
+            return crudRepository.save(meal);
         }
         return null;
     }
@@ -42,16 +35,12 @@ public class DataJpaMealRepository implements MealRepository {
 
     @Override
     public Meal get(int id, int userId) {
-        Meal meal = crudRepository.findById(id).orElse(null);
-        if (meal != null && meal.getUser().getId().equals(userId)) {
-            return meal;
-        }
-        return null;
+        return crudRepository.findById(id).filter(x->x.getUser().getId().equals(userId)).orElse(null);
     }
 
     @Override
     public List<Meal> getAll(int userId) {
-        return crudRepository.findAllById(userId);
+        return crudRepository.getAllByUserId(userId);
     }
 
     @Override
