@@ -2,17 +2,24 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd">
 
-<!--
-    <bean class="ru.javawebinar.topjava.repository.inmemory.InMemoryUserRepository" id="inmemoryUserRepository"/>
+    <!--
+        <bean class="ru.javawebinar.topjava.repository.jpa.JpaUserRepository" id="dbUserRepository" />
 
-    <bean class="ru.javawebinar.topjava.service.UserService">
-        <constructor-arg name="repository" ref="inmemoryUserRepository"/>
-    </bean>
--->
+        <bean class="ru.javawebinar.topjava.service.UserService">
+            <constructor-arg name="repository" ref="dbUserRepository"/>
+        </bean>
+
+        <bean class="ru.javawebinar.topjava.repository.jpa.JpaMealRepository" id="dbMealRepository"/>
+
+        <bean class="ru.javawebinar.topjava.service.MealService">
+            <constructor-arg name="repository" ref="dbMealRepository"/>
+        </bean>
+        -->
     <import resource="spring-cache.xml"/>
 
-    <context:component-scan base-package="ru.javawebinar.**.service"/>
+    <!--  <context:component-scan base-package="ru.javawebinar.**.repository"/>-->
+      <context:component-scan base-package="ru.javawebinar.**.service"/>
 
-    <context:component-scan base-package="ru.javawebinar.**.web"/>
+       <context:component-scan base-package="ru.javawebinar.**.web"/>
 
-</beans>
+   </beans>
