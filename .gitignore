@@ -4,6 +4,5 @@ target
 *.iml
 log
 *.patch
-src/test/java/ru/javawebinar/topjava/service/AllServiceTest.java
 
 
