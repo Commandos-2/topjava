@@ -15,7 +15,7 @@ import ru.javawebinar.topjava.repository.UserRepository;
 import java.util.List;
 
 @Repository
-//@Transactional(readOnly = true)
+@Transactional(readOnly = true)
 public class JdbcUserRepository implements UserRepository {
 
     private static final BeanPropertyRowMapper<User> ROW_MAPPER = BeanPropertyRowMapper.newInstance(User.class);
@@ -65,9 +65,10 @@ public class JdbcUserRepository implements UserRepository {
 
     @Override
     public User getByEmail(String email) {
-//        return jdbcTemplate.queryForObject("SELECT * FROM users WHERE email=?", ROW_MAPPER, email);
-        List<User> users = jdbcTemplate.query("SELECT * FROM users WHERE email=?", ROW_MAPPER, email);
-        return DataAccessUtils.singleResult(users);
+        //List<User> users = jdbcTemplate.query("SELECT u.*,r.role FROM users u LEFT JOIN (select * from user_roles where user_id = 100001 limit 1) r ON u.id=r.user_id WHERE email=?", ROW_MAPPER, email);
+        List<User> users = jdbcTemplate.query("SELECT u.*,r.role as roles FROM users u LEFT JOIN user_roles r ON u.id=r.user_id WHERE email=?", new UserMapper(), email);
+       // User user=DataAccessUtils.singleResult(users);
+        return User.getOneUser(users);
     }
 
     @Override

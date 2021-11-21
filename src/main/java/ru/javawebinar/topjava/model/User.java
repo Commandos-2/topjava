@@ -22,9 +22,10 @@ import static ru.javawebinar.topjava.util.MealsUtil.DEFAULT_CALORIES_PER_DAY;
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 @NamedQueries({
         @NamedQuery(name = User.DELETE, query = "DELETE FROM User u WHERE u.id=:id"),
-        @NamedQuery(name = User.BY_EMAIL, query = "SELECT u FROM User u LEFT JOIN FETCH u.roles WHERE u.email=?1"),
+        @NamedQuery(name = User.BY_EMAIL, query = "SELECT DISTINCT u FROM User u LEFT JOIN FETCH u.roles WHERE u.email=?1"),
         @NamedQuery(name = User.ALL_SORTED, query = "SELECT u FROM User u ORDER BY u.name, u.email"),
 })
+
 @Entity
 @Table(name = "users")
 public class User extends AbstractNamedEntity {
@@ -59,7 +60,7 @@ public class User extends AbstractNamedEntity {
     @ElementCollection(fetch = FetchType.EAGER)
 //    @Fetch(FetchMode.SUBSELECT)
     @BatchSize(size = 200)
-    @JoinColumn(name = "user_id") //https://stackoverflow.com/a/62848296/548473
+    //@JoinColumn(name = "user_id") //https://stackoverflow.com/a/62848296/548473
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<Role> roles;
 
@@ -91,6 +92,16 @@ public class User extends AbstractNamedEntity {
         this.enabled = enabled;
         this.registered = registered;
         setRoles(roles);
+    }
+
+    public static User getOneUser(List<User> users){
+        List<Role> roles=new ArrayList<>();
+        for (User entity:users){
+            roles.addAll(entity.getRoles());
+        }
+        User user=users.stream().findAny().get();
+        user.setRoles(roles);
+        return user;
     }
 
     public String getEmail() {
