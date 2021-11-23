@@ -60,7 +60,7 @@ public class User extends AbstractNamedEntity {
     @ElementCollection(fetch = FetchType.EAGER)
 //    @Fetch(FetchMode.SUBSELECT)
     @BatchSize(size = 200)
-    //@JoinColumn(name = "user_id") //https://stackoverflow.com/a/62848296/548473
+    @JoinColumn(name = "user_id") //https://stackoverflow.com/a/62848296/548473
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<Role> roles;
 
@@ -92,16 +92,6 @@ public class User extends AbstractNamedEntity {
         this.enabled = enabled;
         this.registered = registered;
         setRoles(roles);
-    }
-
-    public static User getOneUser(List<User> users){
-        List<Role> roles=new ArrayList<>();
-        for (User entity:users){
-            roles.addAll(entity.getRoles());
-        }
-        User user=users.stream().findAny().get();
-        user.setRoles(roles);
-        return user;
     }
 
     public String getEmail() {
