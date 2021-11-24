@@ -58,7 +58,7 @@ public abstract class AbstractServiceTest {
 
     //Set<ConstraintViolation<T>> violations = validator.validate(new Event());
 
-    protected boolean checkJdbcProfile(){
-       return Arrays.asList(environment.getActiveProfiles()).contains(JDBC);
+    protected boolean checkJdbcProfile() {
+        return Arrays.asList(environment.getActiveProfiles()).contains(JDBC);
     }
 }

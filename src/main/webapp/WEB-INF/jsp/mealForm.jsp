@@ -8,7 +8,7 @@
 <jsp:include page="fragments/bodyHeader.jsp"/>
 <section>
     <jsp:useBean id="meal" type="ru.javawebinar.topjava.model.Meal" scope="request"/>
-        <h3><spring:message code="<%=meal.getId()!=null ? "meal.update" : "meal.create"%>"/></h3>
+    <h3><spring:message code="${not empty meal.getId() ? 'meal.update' : 'meal.create'}"/></h3>
     <form method="post" action="meals">
         <input type="hidden" name="id" value="${meal.id}">
         <dl>
@@ -24,7 +24,7 @@
             <dd><input type="number" value="${meal.calories}" name="calories" required></dd>
         </dl>
         <button type="submit"><spring:message code="meal.save"/></button>
-        <button onclick="window.history.back()" type="button">Cancel</button>
+        <button onclick="window.history.back()" type="button"><spring:message code="meal.cancel"/></button>
     </form>
 </section>
 <jsp:include page="fragments/footer.jsp"/>

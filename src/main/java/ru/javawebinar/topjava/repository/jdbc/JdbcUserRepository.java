@@ -5,6 +5,7 @@ import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
@@ -15,6 +16,8 @@ import ru.javawebinar.topjava.repository.UserRepository;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -31,10 +34,10 @@ public class JdbcUserRepository implements UserRepository {
     private final SimpleJdbcInsert insertUser;
 
     private final ResultSetExtractor<List<User>> resultSetExtractor = (rs) -> {
-        Map<Integer, User> map = new java.util.HashMap<>(Map.of());
-        Integer id;
+        Map<Integer, User> map = new HashMap();
         while (rs.next()) {
             User user = new User();
+            Integer id;
             id = rs.getInt("id");
             if (!map.containsKey(id)) {
                 user.setId(id);
@@ -48,18 +51,13 @@ public class JdbcUserRepository implements UserRepository {
             } else {
                 user = map.get(id);
             }
-            // System.out.println(user);
             String role = rs.getString("roles");
             if (role != null) {
-                if (role.equals("USER")) {
-                    user.getRoles().add(Role.USER);
-                } else if (role.equals("ADMIN")) {
-                    user.getRoles().add(Role.ADMIN);
-                }
+                user.getRoles().add(Role.valueOf(role));
             }
             map.put(id, user);
         }
-        return map.values().stream().toList();
+        return new ArrayList<>(map.values());
     };
 
     @Autowired
@@ -75,66 +73,26 @@ public class JdbcUserRepository implements UserRepository {
     @Override
     @Transactional
     public User save(User user) {
+        BeanPropertySqlParameterSource parameterSource = new BeanPropertySqlParameterSource(user);
+
         if (user.isNew()) {
-            List<Role> list = user.getRoles().stream().toList();
-            if (jdbcTemplate.batchUpdate("INSERT INTO users (name, email,password,registered,enabled,calories_per_day) VALUES (?,?,?,?,?,?)", new BatchPreparedStatementSetter() {
-                public void setValues(PreparedStatement ps, int i) throws SQLException {
-                    ps.setString(1, user.getName());
-                    ps.setString(2, user.getEmail());
-                    ps.setString(3, user.getPassword());
-                    ps.setDate(4, new java.sql.Date(user.getRegistered().getTime()));
-                    ps.setBoolean(5, user.isEnabled());
-                    ps.setInt(6, user.getCaloriesPerDay());
-                }
-
-                public int getBatchSize() {
-                    return 1;
-                }
-            }).length == 1 && jdbcTemplate.batchUpdate(
-                    "INSERT INTO user_roles (role, user_id) VALUES (?,?)",
-                    new BatchPreparedStatementSetter() {
-
-                        public void setValues(PreparedStatement ps, int i) throws SQLException {
-                            ps.setString(1, convertRoleToString(list.get(i)));
-                            ps.setInt(2, getByEmail(user.getEmail()).getId());
-                        }
-
-                        public int getBatchSize() {
-                            return list.size();
-                        }
-                    }).length == user.getRoles().size()) {
-                return getByEmail(user.getEmail());
-            } else {
+            Number newKey = insertUser.executeAndReturnKey(parameterSource);
+            int id = newKey.intValue();
+            user.setId(id);
+            if (insertRoles(user, id) != user.getRoles().size()) {
                 return null;
             }
-        } else {
-            if (jdbcTemplate.batchUpdate(
-                    "UPDATE users SET name=?, email=?,password=?,registered=?,enabled=?,calories_per_day=? WHERE id=?",
-                    new BatchPreparedStatementSetter() {
-                        public void setValues(PreparedStatement ps, int i) throws SQLException {
-                            ps.setString(1, user.getName());
-                            ps.setString(2, user.getEmail());
-                            ps.setString(3, user.getPassword());
-                            ps.setDate(4, new java.sql.Date(user.getRegistered().getTime()));
-                            ps.setBoolean(5, user.isEnabled());
-                            ps.setInt(6, user.getCaloriesPerDay());
-                            ps.setInt(7, user.getId());
-                        }
 
-                        public int getBatchSize() {
-                            return 1;
-                        }
-                    }).length == 1 && jdbcTemplate.batchUpdate(
-                    "UPDATE user_roles SET role=? WHERE user_id=?", user.getRoles(), user.getRoles().size(),
-                    (ps, role) -> {
-                        ps.setString(1, convertRoleToString(role));
-                        ps.setInt(2, user.getId());
-                    }).length == user.getRoles().size()) {
-                return user;
-            } else {
+        } else {
+            jdbcTemplate.update("DELETE FROM user_roles WHERE user_id=?", user.getId());
+            if (namedParameterJdbcTemplate.update("""
+                       UPDATE users SET name=:name, email=:email, password=:password, 
+                       registered=:registered, enabled=:enabled, calories_per_day=:caloriesPerDay WHERE id=:id
+                    """, parameterSource) == 0 || insertRoles(user, user.getId()) != user.getRoles().size()) {
                 return null;
             }
         }
+        return user;
     }
 
     @Override
@@ -145,28 +103,44 @@ public class JdbcUserRepository implements UserRepository {
 
     @Override
     public User get(int id) {
-        return DataAccessUtils.singleResult(jdbcTemplate.query("SELECT u.*,r.role as roles FROM users u LEFT JOIN user_roles r ON u.id=r.user_id WHERE id=?", resultSetExtractor, id));
+        return DataAccessUtils.singleResult(jdbcTemplate.query("SELECT u.*,r.role as roles " +
+                "FROM users u LEFT JOIN user_roles r ON u.id=r.user_id WHERE id=?", resultSetExtractor, id));
     }
 
     @Override
     public User getByEmail(String email) {
-        return DataAccessUtils.singleResult(jdbcTemplate.query("SELECT u.*,r.role as roles FROM users u LEFT JOIN user_roles r ON u.id=r.user_id WHERE email=?", resultSetExtractor, email));
+        return DataAccessUtils.singleResult(jdbcTemplate.query("SELECT u.*,r.role as roles" +
+                " FROM users u LEFT JOIN user_roles r ON u.id=r.user_id WHERE email=?", resultSetExtractor, email));
     }
 
     @Override
     public List<User> getAll() {
-        return jdbcTemplate.query("SELECT u.*,r.role as roles FROM users u LEFT JOIN user_roles r ON u.id=r.user_id ORDER BY name, email", resultSetExtractor);
+        return jdbcTemplate.query("SELECT u.*,r.role as roles FROM users u LEFT JOIN" +
+                " user_roles r ON u.id=r.user_id ORDER BY name, email", resultSetExtractor);
     }
 
     private static String convertRoleToString(Role roles) {
 
         if (roles != null) {
-            if (roles.equals(Role.USER)) {
-                return "USER";
-            } else if (roles.equals(Role.ADMIN)) {
-                return "ADMIN";
-            }
+            return roles.toString();
         }
         return null;
+    }
+
+    private int insertRoles(User user, int id) {
+        List<Role> list = user.getRoles().stream().toList();
+        return jdbcTemplate.batchUpdate(
+                "INSERT INTO user_roles (role, user_id) VALUES (?,?)",
+                new BatchPreparedStatementSetter() {
+
+                    public void setValues(PreparedStatement ps, int i) throws SQLException {
+                        ps.setString(1, convertRoleToString(list.get(i)));
+                        ps.setInt(2, id);
+                    }
+
+                    public int getBatchSize() {
+                        return list.size();
+                    }
+                }).length;
     }
 }
