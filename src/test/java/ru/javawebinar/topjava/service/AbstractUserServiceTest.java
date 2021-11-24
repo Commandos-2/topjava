@@ -40,7 +40,7 @@ public abstract class AbstractUserServiceTest extends AbstractServiceTest {
         User newUser = getNew();
         newUser.setId(newId);
         USER_MATCHER.assertMatch(created, newUser);
-        USER_MATCHER.assertMatch(service.getAll(), newUser, newUser);
+        USER_MATCHER.assertMatch(service.getAll(), admin, newUser, user);
     }
 
     @Test
@@ -81,7 +81,7 @@ public abstract class AbstractUserServiceTest extends AbstractServiceTest {
     public void f1update() {
         User updated = getUpdated();
         service.update(updated);
-        USER_MATCHER.assertMatch(service.getAll(), admin, getUpdated());
+        USER_MATCHER.assertMatch(service.getAll(), getUpdated(), user);
     }
 
     @Test
