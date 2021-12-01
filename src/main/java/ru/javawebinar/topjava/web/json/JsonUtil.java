@@ -21,7 +21,7 @@ public class JsonUtil {
 
     public static <T> T readValue(String json, Class<T> clazz) {
         try {
-            return getMapper().readValue(json, clazz);
+            return getMapper().readerFor(clazz).readValue(json, clazz);
         } catch (IOException e) {
             throw new IllegalArgumentException("Invalid read from JSON:\n'" + json + "'", e);
         }

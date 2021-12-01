@@ -22,6 +22,11 @@ public class AdminRestController extends AbstractUserController {
         return super.getAll();
     }
 
+    @GetMapping("/withMeals")
+    public List<User> getWithMeals() {
+        return super.getAll();
+    }
+
     @Override
     @GetMapping("/{id}")
     public User get(@PathVariable int id) {
