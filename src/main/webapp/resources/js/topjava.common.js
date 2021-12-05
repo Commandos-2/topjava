@@ -1,13 +1,21 @@
-let form;
+let detailsform;
+let filterform;
 
 function makeEditable(datatableApi) {
     ctx.datatableApi = datatableApi;
-    form = $('#detailsForm');
+    detailsform = $('#detailsForm');
     $(".delete").click(function () {
         if (confirm('Are you sure?')) {
             deleteRow($(this).closest('tr').attr("id"));
         }
     });
+
+    $(".checkbox").change(function () {
+        alert("Deleted11")
+        successNoty("Deleted");
+    });
+
+
 
     $(document).ajaxError(function (event, jqXHR, options, jsExc) {
         failNoty(jqXHR);
@@ -18,7 +26,7 @@ function makeEditable(datatableApi) {
 }
 
 function add() {
-    form.find(":input").val("");
+    detailsform.find(":input").val("");
     $("#editRow").modal();
 }
 
@@ -42,7 +50,7 @@ function save() {
     $.ajax({
         type: "POST",
         url: ctx.ajaxUrl,
-        data: form.serialize()
+        data: detailsform.serialize()
     }).done(function () {
         $("#editRow").modal("hide");
         updateTable();
