@@ -1,7 +1,10 @@
 package ru.javawebinar.topjava.repository.datajpa;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.repository.UserRepository;
 
@@ -10,7 +13,7 @@ import java.util.List;
 @Repository
 public class DataJpaUserRepository implements UserRepository {
     private static final Sort SORT_NAME_EMAIL = Sort.by(Sort.Direction.ASC, "name", "email");
-
+    private final Logger log = LoggerFactory.getLogger(getClass());
     private final CrudUserRepository crudRepository;
 
     public DataJpaUserRepository(CrudUserRepository crudRepository) {
@@ -39,11 +42,21 @@ public class DataJpaUserRepository implements UserRepository {
 
     @Override
     public List<User> getAll() {
-        return crudRepository.findAll(SORT_NAME_EMAIL);
+        List<User> list=crudRepository.findAll(SORT_NAME_EMAIL);
+        log.info(list.toString());
+        return list;
     }
 
     @Override
     public User getWithMeals(int id) {
         return crudRepository.getWithMeals(id);
+    }
+
+    @Transactional
+    public User updateEnabled(int id, boolean enabled) {
+        User user = get(id);
+        user.setEnabled(enabled);
+        //crudRepository.updateEnabled(enabled,id);
+        return save(user);
     }
 }

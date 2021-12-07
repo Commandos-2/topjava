@@ -47,6 +47,19 @@ $(function () {
     },
 );
 
-function setEnabled() {
-    alert('Включен');
+function updateThisTable() {
+    $.get(ctx.ajaxUrl, function (data) {
+        ctx.datatableApi.clear().rows.add(data).draw();
+    });
+}
+
+function setEnabled(enabled, id) {
+    $.ajax({
+        url: ctx.ajaxUrl+"enabled",
+        type: "POST",
+        data: { id: id, enabled: enabled }
+    }).done(function () {
+        updateTable();
+        successNoty("Update enabled");
+    });
 }

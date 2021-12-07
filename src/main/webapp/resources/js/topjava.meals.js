@@ -32,22 +32,23 @@ $(function () {
             "order": [
                 [
                     0,
-                    "asc"
+                    "desc"
                 ]
             ]
         })
     );
 });
 
+function updateThisTable() {
+    filterMeal();
+}
+
 function filterMeal() {
     filterform = $('#filterForm');
-    let filteredMeals;
     $.ajax({
         type: "GET",
         url: ctx.ajaxUrl + "filter",
         data: filterform.serialize()
-    }, function (data) {
-        filteredMeals=data;
     }).done(function (filteredMeals) {
         ctx.datatableApi.clear().rows.add(filteredMeals).draw();
         successNoty("Filtered");
