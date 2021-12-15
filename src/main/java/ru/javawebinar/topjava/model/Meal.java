@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.validator.constraints.Range;
+import org.springframework.lang.Nullable;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -88,8 +89,12 @@ public class Meal extends AbstractBaseEntity {
         this.description = description;
     }
 
-    public void setCalories(int calories) {
-        this.calories = calories;
+    public void setCalories(@Nullable Integer calories) {
+        if (calories == null) {
+            this.calories = 0;
+        } else {
+            this.calories = calories;
+        }
     }
 
     public User getUser() {

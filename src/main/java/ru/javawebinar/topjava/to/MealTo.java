@@ -6,28 +6,25 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.beans.ConstructorProperties;
-import java.io.Serial;
-import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-public class MealTo extends BaseTo implements Serializable {
-    @Serial
-    private static final long serialVersionUID = 1L;
+public class MealTo extends BaseTo {
 
     @NotNull
     private LocalDateTime dateTime;
 
     @NotBlank
-    @Size(min = 2, max = 100, message = "length must be between 2 and 100 characters")
+    @Size(min = 2, max = 120, message = "length must be between 2 and 120 characters")
     private String description;
 
-    @Range(min = 10, max = 10000, message = "Calories must be between 10 and 10000")
-    @NotNull
+    @Range(min = 10, max = 5000, message = "Calories must be between 10 and 5000")
     private int calories;
 
-    @NotNull
     private boolean excess;
+
+    public MealTo() {
+    }
 
     @ConstructorProperties({"id", "dateTime", "description", "calories", "excess"})
     public MealTo(Integer id, LocalDateTime dateTime, String description, int calories, boolean excess) {
@@ -36,10 +33,6 @@ public class MealTo extends BaseTo implements Serializable {
         this.description = description;
         this.calories = calories;
         this.excess = excess;
-    }
-
-    public MealTo() {
-
     }
 
     public void setDateTime(LocalDateTime dateTime) {
